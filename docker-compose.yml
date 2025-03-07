@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16.4
+    container_name: university-db
+    environment:
+      POSTGRES_USER: edu
+      POSTGRES_PASSWORD: edu4edu
+      POSTGRES_DB: edudb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - university-network
+
+  dev-env:
+    build: .
+    container_name: university-vm
+    stdin_open: true
+    tty: true
+    volumes:
+      - /home/jan_debian/vsa/:/app
+    ports:
+      - "8080:8080"
+      - "4848:4848"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=jdbc:postgresql://db:5432/edudb
+      - DATABASE_USER=edu
+      - DATABASE_PASSWORD=edu4edu
+    networks:
+      - university-network
+
+volumes:
+  postgres_data:
+
+networks:
+  university-network:
